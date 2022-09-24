@@ -107,6 +107,8 @@ class RemindersListViewModelTest {
 
     }
 
+
+    // the reminders in this test should not be founded
     @Test
     fun loadReminders_shouldReturnError()= mainCoroutineRule.runBlockingTest{
 

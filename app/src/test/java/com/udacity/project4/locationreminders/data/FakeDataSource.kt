@@ -16,9 +16,11 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf())
         if(shouldReturnError){
             return Result.Error("Reminders not found")
         }
-        reminders?.let { return Result.Success(ArrayList(it)) }
+        reminders?.let {
+            return Result.Success(ArrayList(it))
+        }
         return Result.Error("Reminders not found")
-
+        // I used shouldReturnError to test the Live data objects
     }
 
     override suspend fun saveReminder(reminder: ReminderDTO) {
