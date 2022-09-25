@@ -8,19 +8,19 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf())
 
     private var shouldReturnError = false
 
-    fun setShouldReturnError( value:Boolean){
+
+    fun setReturnError(value: Boolean) {
         shouldReturnError = value
     }
 
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
-        if(shouldReturnError){
-            return Result.Error("Reminders not found")
+        if (shouldReturnError) {
+            return Result.Error(
+                "Error getting reminders"
+            )
         }
-        reminders?.let {
-            return Result.Success(ArrayList(it))
-        }
+        reminders?.let { return Result.Success(it) }
         return Result.Error("Reminders not found")
-        // I used shouldReturnError to test the Live data objects
     }
 
     override suspend fun saveReminder(reminder: ReminderDTO) {
@@ -28,23 +28,27 @@ class FakeDataSource(var reminders: MutableList<ReminderDTO>? = mutableListOf())
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
-        if(shouldReturnError){
-            return Result.Error("Reminder not found")
+        val reminder = reminders?.find { reminderDTO ->
+            reminderDTO.id == id
         }
-        val reminder = reminders?.find {
-            it.id == id
-        }
-        return if (reminder!=null){
-            Result.Success(reminder)
-        } else{
-            Result.Error("Reminder not found")
+
+        return when {
+            shouldReturnError -> {
+                Result.Error("Reminder not found!")
+            }
+
+            reminder != null -> {
+                Result.Success(reminder)
+            }
+            else -> {
+                Result.Error("Reminder not found!")
+            }
         }
     }
 
     override suspend fun deleteAllReminders() {
         reminders?.clear()
     }
-
     override suspend fun deleteReminder(id: String) {
         val reminder = reminders?.find {
             it.id == id

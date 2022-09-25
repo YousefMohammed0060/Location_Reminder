@@ -34,6 +34,7 @@ import com.udacity.project4.utils.EspressoIdlingResource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.`is`
 import org.junit.After
 import org.junit.Before
@@ -55,25 +56,13 @@ import org.koin.test.KoinTest
 @LargeTest
 //END TO END test to black box test the app
 class RemindersActivityTest :
-    KoinTest {// Extended Koin Test - embed autoclose @after method to close Koin after every test
+    AutoCloseKoinTest() {// Extended Koin Test - embed autoclose @after method to close Koin after every test
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
 
-    // An Idling Resource that waits for Data Binding to have no pending bindings
+    // An idling resource that waits for Data Binding to have no pending bindings.
     private val dataBindingIdlingResource = DataBindingIdlingResource()
-
-    @get:Rule
-    val activityRule = ActivityTestRule(RemindersActivity::class.java)
-
-    // get activity context
-    private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity? {
-        var activity: Activity? = null
-        activityScenario.onActivity {
-            activity = it
-        }
-        return activity
-    }
 
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
@@ -112,6 +101,13 @@ class RemindersActivityTest :
         }
     }
 
+
+
+
+    /**
+     * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
+     * are not scheduled in the main Looper (for example when executed on a different thread).
+     */
     @Before
     fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
@@ -128,62 +124,75 @@ class RemindersActivityTest :
     }
 
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun showReminderSavedToast() = runBlocking{
+    fun saveReminderScreen_showSnackBarTitleError() {
+
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.reminderTitle)).perform(typeText("TITLE1"), closeSoftKeyboard())
-        onView(withId(R.id.reminderDescription)).perform(typeText("DESC1"), closeSoftKeyboard())
+        onView(withId(R.id.saveReminder)).perform(click())
+
+        val snackBarMessage = appContext.getString(R.string.err_enter_title)
+        onView(withText(snackBarMessage)).check(matches(isDisplayed()))
+
+        activityScenario.close()
+    }
+
+    @Test
+    fun saveReminderScreen_showSnackBarLocationError() {
+
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.addReminderFAB)).perform(click())
+        onView(withId(R.id.reminderTitle)).perform(typeText("Title"))
+        Espresso.closeSoftKeyboard()
+        onView(withId(R.id.saveReminder)).perform(click())
+
+        val snackBarMessage = appContext.getString(R.string.err_select_location)
+        onView(withText(snackBarMessage)).check(matches(isDisplayed()))
+
+        activityScenario.close()
+    }
+
+    @Test
+    fun saveReminderScreen_showToastMessage() {
+
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.addReminderFAB)).perform(click())
+        onView(withId(R.id.reminderTitle)).perform(typeText("Title"))
+        Espresso.closeSoftKeyboard()
+        onView(withId(R.id.reminderDescription)).perform(typeText("Description"))
+        Espresso.closeSoftKeyboard()
+
         onView(withId(R.id.selectLocation)).perform(click())
-
-        onView(withId(com.google.android.material.R.id.snackbar_action)).perform(click())
-
         onView(withId(R.id.map)).perform(longClick())
         onView(withId(R.id.button_save)).perform(click())
+
         onView(withId(R.id.saveReminder)).perform(click())
 
-
-        onView(withText(R.string.reminder_saved)).inRoot(withDecorView(not(`is`(getActivity(activityScenario)?.window?.decorView))))
-            .check(
-                matches(
-                    isDisplayed()
+        onView(withText(R.string.reminder_saved)).inRoot(withDecorView(
+            CoreMatchers.not(
+                CoreMatchers.`is`(
+                    getActivity(activityScenario).window.decorView
                 )
             )
+        ))
+
 
         activityScenario.close()
     }
 
-    @Test
-    fun showSnackbar_enterTitle(){
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-
-        onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.saveReminder)).perform(click())
-
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText(R.string.err_enter_title)))
-
-        activityScenario.close()
-
+    private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity {
+        lateinit var activity: Activity
+        activityScenario.onActivity {
+            activity = it
+        }
+        return activity
     }
 
-    @Test
-    fun showSnackbar_enterLocation(){
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.reminderTitle)).perform(typeText("TITLE1"), closeSoftKeyboard())
-        onView(withId(R.id.saveReminder)).perform(click())
-
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText(R.string.err_select_location)))
-
-        activityScenario.close()
-
-    }
 }
