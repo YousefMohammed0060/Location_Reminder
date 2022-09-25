@@ -95,24 +95,23 @@ class ReminderListFragmentTest: KoinTest {
         dataSource.deleteAllReminders()
     }
 
-//    @get:Rule
-//    val activityRule = ActivityTestRule(RemindersActivity::class.java)
 
 
+    // this test trying to test that UI can load reminders in the recyclerView
     @Test
     fun reminderList_DisplayedInUi() = runBlockingTest{
-        // GIVEN - Add active (incomplete) task to the DB
+        // GIVEN - add reminders
         dataSource.saveReminder(reminder1)
         dataSource.saveReminder(reminder2)
         dataSource.saveReminder(reminder3)
 
+        //WHEN - on ReminderListFragment
         val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
-
-        //then
+        //THEN - data loaded into the right place
         onView(withText(reminder1.title)).check(matches(isDisplayed()))
         onView(withText(reminder2.description)).check(matches(isDisplayed()))
         onView(withText(reminder3.title)).check(matches(isDisplayed()))
@@ -120,26 +119,31 @@ class ReminderListFragmentTest: KoinTest {
 
     }
 
+
+    // this test trying to test that UI show us that no data if the room database is empty
     @Test
     fun reminderList_noReminders() = runBlockingTest{
-        // GIVEN - Add active (incomplete) task to the DB
+        // GIVEN - delete all data
         dataSource.deleteAllReminders()
 
+        //WHEN - on the ReminderListFragment
         val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
-        //then
+
+        //THEN - shows that no data
         onView(withText(R.string.no_data)).check(matches(isDisplayed()))
         onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
         onView(withText(reminder1.title)).check(doesNotExist())
 
     }
 
+
+    // this test trying to test that when we click the fab_btn it navigate to destination fragment
     @Test
     fun clickFab_navigateToReminderFragment() = runBlockingTest {
-
         // GIVEN - On the home screen
         val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
         val navController = mock(NavController::class.java)

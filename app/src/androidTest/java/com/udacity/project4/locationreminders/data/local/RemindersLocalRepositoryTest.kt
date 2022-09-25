@@ -53,17 +53,19 @@ class RemindersLocalRepositoryTest {
     }
 
 
+    // this test trying to save the reminder and call it from room database
     @Test
     fun saveReminder_retrieveReminderById() = runBlocking {
+        //GIVEN
         val reminder = ReminderDTO("My Shop", "Get to the Shop", "Abuja", 6.54545, 7.54545)
         remindersLocalRepository.saveReminder(reminder)
 
+        //WHEN
         val result = remindersLocalRepository.getReminder(reminder.id) as? Result.Success
 
+        //THEN
         MatcherAssert.assertThat(result is Result.Success, `is`(true))
         result as Result.Success
-
-
         MatcherAssert.assertThat(result.data.title, `is`(reminder.title))
         MatcherAssert.assertThat(result.data.description, `is`(reminder.description))
         MatcherAssert.assertThat(result.data.latitude, `is`(reminder.latitude))
@@ -72,30 +74,36 @@ class RemindersLocalRepositoryTest {
     }
 
 
+    // this test trying to delete all reminders and check that room database is empty
     @Test
     fun deleteReminders_EmptyList()= runBlocking {
+        //GIVEN
         val reminder = ReminderDTO("My Shop", "Get to the Shop", "Abuja", 6.54545, 7.54545)
         remindersLocalRepository.saveReminder(reminder)
-
         remindersLocalRepository.deleteAllReminders()
 
+        //WHEN
         val result = remindersLocalRepository.getReminders()
 
+        //THEN
         MatcherAssert.assertThat(result is Result.Success, `is`(true))
         result as Result.Success
-
         MatcherAssert.assertThat(result.data, `is`(emptyList()))
     }
 
+
+    // this test trying to add reminder and delete it and check what will happen if we call that reminder
     @Test
     fun retrieveReminderById_ReturnError() = runBlocking {
+        //GIVEN
         val reminder = ReminderDTO("My Shop", "Get to the Shop", "Abuja", 6.54545, 7.54545)
         remindersLocalRepository.saveReminder(reminder)
-
         remindersLocalRepository.deleteAllReminders()
 
+        //WHEN
         val result = remindersLocalRepository.getReminder(reminder.id)
 
+        //THEN
         MatcherAssert.assertThat(result is Result.Error, `is`(true))
         result as Result.Error
         MatcherAssert.assertThat(result.message, `is`("Reminder not found!"))

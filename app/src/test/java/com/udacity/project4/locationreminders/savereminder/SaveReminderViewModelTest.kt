@@ -62,28 +62,42 @@ class SaveReminderViewModelTest {
         stopKoin()
     }
 
+
+    //  test to check what will be happen if data missing the title
     @Test
     fun validateEnteredData_EmptyTitleAndUpdateSnackBar() {
+        // GIVEN
         val reminder = ReminderDataItem("", "Description", "My School", 7.32323, 6.54343,"1")
 
-        Truth.assertThat(viewModel.validateEnteredData(reminder)).isFalse()
+        // THEN
+        assertThat(viewModel.validateEnteredData(reminder)).isFalse()
         assertThat(viewModel.showSnackBarInt.getOrAwaitValue()).isEqualTo(R.string.err_enter_title)
     }
 
+
+    //  test to check what will be happen if data missing the location name
     @Test
     fun validateEnteredData_EmptyLocationAndUpdateSnackBar() {
+        // GIVEN
         val reminder = ReminderDataItem("Title", "Description", "", 7.32323, 6.54343,"2")
 
-        Truth.assertThat(viewModel.validateEnteredData(reminder)).isFalse()
+        // THEN
+        assertThat(viewModel.validateEnteredData(reminder)).isFalse()
         assertThat(viewModel.showSnackBarInt.getOrAwaitValue()).isEqualTo(R.string.err_select_location)
     }
 
 
+    //  test to check what will be happen if all data submitted
     @Test
     fun saveReminder_showLoading(){
+        // GIVEN
         val reminder = ReminderDataItem("Title", "Description", "Airport", 7.32323, 6.54343,"3")
+
+        // WHEN
         mainCoroutineRule.pauseDispatcher()
         viewModel.saveReminder(reminder)
+
+        // THEN
         assertThat(viewModel.showLoading.getOrAwaitValue()).isTrue()
         mainCoroutineRule.resumeDispatcher()
         assertThat(viewModel.showLoading.getOrAwaitValue()).isFalse()

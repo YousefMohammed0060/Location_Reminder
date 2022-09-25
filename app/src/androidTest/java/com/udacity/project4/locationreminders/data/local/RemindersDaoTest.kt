@@ -46,16 +46,17 @@ class RemindersDaoTest {
     @After
     fun closeDb() = database.close()
 
+    // this test trying to get record from room database using id
     @Test
     fun saveReminder_GetById() = runBlockingTest {
+        // GIVEN - add reminder
         val reminder = ReminderDTO("My Shop", "Get to the Shop", "Abuja", 6.54545, 7.54545)
-
-
         database.reminderDao().saveReminder(reminder)
 
+        //WHEN - get the reminder
         val result = database.reminderDao().getReminderById(reminder.id)
 
-
+        // THEN - check that data is correct
         assertThat(result as ReminderDTO, notNullValue())
         assertThat(result.id, `is`(reminder.id))
         assertThat(result.title, `is`(reminder.title))
@@ -66,35 +67,42 @@ class RemindersDaoTest {
 
     }
 
+
+    // this test trying to get all records from room database
     @Test
     fun getAllRemindersFromDb() = runBlockingTest {
+        //GIVEN - add reminders
         val reminder = ReminderDTO("My Shop", "Get to the Shop", "Abuja", 6.54545, 7.54545)
         val reminder2 = ReminderDTO("My Work place", "Get to the office", "Wuse", 6.57545, 7.53845)
         val reminder3 = ReminderDTO("My Gym", "Get to the Gym", "Karu", 6.87645, 7.98555)
-
         database.reminderDao().saveReminder(reminder)
         database.reminderDao().saveReminder(reminder2)
         database.reminderDao().saveReminder(reminder3)
 
+        //WHEN - get data
         val remindersList = database.reminderDao().getReminders()
 
+        //THEN - check that result no equal null
         assertThat(remindersList, `is`(notNullValue()))
     }
 
+
+    // this test trying to delete all records from room database
     @Test
     fun insertReminders_deleteAllReminders() = runBlockingTest {
+        //GIVEN - add reminders
         val reminder = ReminderDTO("My Shop", "Get to the Shop", "Abuja", 6.54545, 7.54545)
         val reminder2 = ReminderDTO("My Work place", "Get to the office", "Wuse", 6.57545, 7.53845)
         val reminder3 = ReminderDTO("My Gym", "Get to the Gym", "Karu", 6.87645, 7.98555)
-
         database.reminderDao().saveReminder(reminder)
         database.reminderDao().saveReminder(reminder2)
         database.reminderDao().saveReminder(reminder3)
 
+        //WHEN - delete data
         database.reminderDao().deleteAllReminders()
-
         val remindersList = database.reminderDao().getReminders()
 
+        //THEN - check that result is an empty list
         assertThat(remindersList, `is`(emptyList()))
     }
 

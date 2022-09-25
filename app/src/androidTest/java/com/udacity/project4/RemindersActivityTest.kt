@@ -123,57 +123,56 @@ class RemindersActivityTest :
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
-
+    // this test make a snakeBar if title is missing
     @Test
     fun saveReminderScreen_showSnackBarTitleError() {
-
+        //WHEN
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
-
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
 
+        //THEN
         val snackBarMessage = appContext.getString(R.string.err_enter_title)
         onView(withText(snackBarMessage)).check(matches(isDisplayed()))
-
         activityScenario.close()
     }
 
+    // this test make a snakeBar if location is missing
     @Test
     fun saveReminderScreen_showSnackBarLocationError() {
-
+        //WHEN
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
-
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(typeText("Title"))
         Espresso.closeSoftKeyboard()
         onView(withId(R.id.saveReminder)).perform(click())
 
+        //THEN
         val snackBarMessage = appContext.getString(R.string.err_select_location)
         onView(withText(snackBarMessage)).check(matches(isDisplayed()))
-
         activityScenario.close()
     }
 
+    // this test check that their no data missing and make snakeBar that data is saved
     @Test
     fun saveReminderScreen_showToastMessage() {
 
+        //WHEN
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
-
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(typeText("Title"))
         Espresso.closeSoftKeyboard()
         onView(withId(R.id.reminderDescription)).perform(typeText("Description"))
         Espresso.closeSoftKeyboard()
-
         onView(withId(R.id.selectLocation)).perform(click())
         onView(withId(R.id.map)).perform(longClick())
         onView(withId(R.id.button_save)).perform(click())
-
         onView(withId(R.id.saveReminder)).perform(click())
 
+        //THEN
         onView(withText(R.string.reminder_saved)).inRoot(withDecorView(
             CoreMatchers.not(
                 CoreMatchers.`is`(
@@ -181,8 +180,6 @@ class RemindersActivityTest :
                 )
             )
         ))
-
-
         activityScenario.close()
     }
 

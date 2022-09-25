@@ -41,7 +41,8 @@ class RemindersListViewModelTest {
     @Before
     fun setupViewModel() {
         remindersRepository = FakeDataSource()
-        viewModel = RemindersListViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
+        viewModel =
+            RemindersListViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
     }
 
     @After
@@ -49,40 +50,47 @@ class RemindersListViewModelTest {
         stopKoin()
     }
 
+    // test to check what will be happen while the app waiting for data
     @Test
     fun loadReminders_showLoading() {
         mainCoroutineRule.pauseDispatcher()
 
+        // WHEN
         viewModel.loadReminders()
-
         assertThat(viewModel.showLoading.getOrAwaitValue()).isTrue()
-
         mainCoroutineRule.resumeDispatcher()
 
+        // THEN
         assertThat(viewModel.showLoading.getOrAwaitValue()).isFalse()
 
     }
 
+    //  test to check what will be happen if list have a data of reminder
     @Test
-    fun loadReminders_remainderListNotEmpty() = mainCoroutineRule.runBlockingTest  {
+    fun loadReminders_remainderListNotEmpty() = mainCoroutineRule.runBlockingTest {
+        // GIVEN
         val reminder = ReminderDTO("My Store", "Pick Stuff", "Abuja", 6.454202, 7.599545)
 
+        // WHEN
         remindersRepository.saveReminder(reminder)
         viewModel.loadReminders()
 
+        // THEN
         assertThat(viewModel.remindersList.getOrAwaitValue()).isNotEmpty()
     }
 
+
+    // test to check what will be happen if list is empty
     @Test
     fun loadReminders_updateSnackBarValue() {
         mainCoroutineRule.pauseDispatcher()
 
+        // WHEN
         remindersRepository.setReturnError(true)
-
         viewModel.loadReminders()
-
         mainCoroutineRule.resumeDispatcher()
 
+        // THEN
         assertThat(viewModel.showSnackBar.getOrAwaitValue()).isEqualTo("Error getting reminders")
     }
 }
