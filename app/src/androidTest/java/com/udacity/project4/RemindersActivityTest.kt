@@ -127,50 +127,55 @@ class RemindersActivityTest :
     @Test
     fun saveReminderScreen_showSnackBarTitleError() {
         //WHEN
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-        onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.saveReminder)).perform(click())
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java) // use ActivityScenario to launch the RemindersActivity
+        dataBindingIdlingResource.monitorActivity(activityScenario) // ask the DataBindingIdlingResource to monitor the ui
+        onView(withId(R.id.addReminderFAB)).perform(click()) // ask the ui to click the float action button and navigate to save reminder fragment
+        onView(withId(R.id.saveReminder)).perform(click()) // ask the ui to click the save button to check the data an save it into database
 
         //THEN
-        val snackBarMessage = appContext.getString(R.string.err_enter_title)
-        onView(withText(snackBarMessage)).check(matches(isDisplayed()))
-        activityScenario.close()
+        val snackBarMessage = appContext.getString(R.string.err_enter_title) // initialize the message that will be show in snackBar
+        onView(withText(snackBarMessage)).check(matches(isDisplayed())) // check that the both messages is equal
+        activityScenario.close() // closing the monitoring
     }
+    // end of test
+
+
 
     // this test make a snakeBar if location is missing
     @Test
     fun saveReminderScreen_showSnackBarLocationError() {
         //WHEN
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-        onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.reminderTitle)).perform(typeText("Title"))
-        Espresso.closeSoftKeyboard()
-        onView(withId(R.id.saveReminder)).perform(click())
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java) // use ActivityScenario to launch the RemindersActivity
+        dataBindingIdlingResource.monitorActivity(activityScenario) // ask the DataBindingIdlingResource to monitor the ui
+        onView(withId(R.id.addReminderFAB)).perform(click()) // ask the ui to click the float action button and navigate to save reminder fragment
+        onView(withId(R.id.reminderTitle)).perform(typeText("Title")) // ask the ui to open the keyboard and type "Title" into reminderTitle editText
+        Espresso.closeSoftKeyboard() // ask the ui to close the keyboard
+        onView(withId(R.id.saveReminder)).perform(click()) // ask the ui to click the save button to check the data an save it into database
 
         //THEN
-        val snackBarMessage = appContext.getString(R.string.err_select_location)
-        onView(withText(snackBarMessage)).check(matches(isDisplayed()))
-        activityScenario.close()
+        val snackBarMessage = appContext.getString(R.string.err_select_location) // initialize the message that will be show in snackBar
+        onView(withText(snackBarMessage)).check(matches(isDisplayed())) // check that the both messages is equal
+        activityScenario.close() // closing the monitoring
     }
+    // end of test
+
 
     // this test check that their no data missing and make snakeBar that data is saved
     @Test
     fun saveReminderScreen_showToastMessage() {
 
         //WHEN
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-        onView(withId(R.id.addReminderFAB)).perform(click())
-        onView(withId(R.id.reminderTitle)).perform(typeText("Title"))
-        Espresso.closeSoftKeyboard()
-        onView(withId(R.id.reminderDescription)).perform(typeText("Description"))
-        Espresso.closeSoftKeyboard()
-        onView(withId(R.id.selectLocation)).perform(click())
-        onView(withId(R.id.map)).perform(longClick())
-        onView(withId(R.id.button_save)).perform(click())
-        onView(withId(R.id.saveReminder)).perform(click())
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java) // use ActivityScenario to launch the RemindersActivity
+        dataBindingIdlingResource.monitorActivity(activityScenario) // ask the DataBindingIdlingResource to monitor the ui
+        onView(withId(R.id.addReminderFAB)).perform(click()) // ask the ui to click the float action button and navigate to save reminder fragment
+        onView(withId(R.id.reminderTitle)).perform(typeText("Title")) // ask the ui to open the keyboard and type "Title" into reminderTitle editText
+        Espresso.closeSoftKeyboard() // ask the ui to close the keyboard
+        onView(withId(R.id.reminderDescription)).perform(typeText("Description")) // ask the ui to open the keyboard and type "Description" into reminderDescription editText
+        Espresso.closeSoftKeyboard() // ask the ui to close the keyboard
+        onView(withId(R.id.selectLocation)).perform(click()) // ask the ui to click selectLocation textView and navigate to map fragment
+        onView(withId(R.id.map)).perform(longClick()) // ask the ui to long click to the location
+        onView(withId(R.id.button_save)).perform(click())  // ask the ui to click button_save  and navigate to save reminder fragment
+        onView(withId(R.id.saveReminder)).perform(click()) // ask the ui to click the save button to check the data an save it into database
 
         //THEN
         onView(withText(R.string.reminder_saved)).inRoot(withDecorView(
@@ -179,9 +184,10 @@ class RemindersActivityTest :
                     getActivity(activityScenario).window.decorView
                 )
             )
-        ))
-        activityScenario.close()
+        )) // after check that all data entered it ask database to save and navigate to reminders fragment
+        activityScenario.close() // closing the monitoring
     }
+    // end of test
 
     private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity {
         lateinit var activity: Activity

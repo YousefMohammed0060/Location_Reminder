@@ -67,39 +67,42 @@ class SaveReminderViewModelTest {
     @Test
     fun validateEnteredData_EmptyTitleAndUpdateSnackBar() {
         // GIVEN
-        val reminder = ReminderDataItem("", "Description", "My School", 7.32323, 6.54343,"1")
+        val reminder = ReminderDataItem("", "Description", "My School", 7.32323, 6.54343,"1") //add the reminder data to create an object
 
         // THEN
-        assertThat(viewModel.validateEnteredData(reminder)).isFalse()
-        assertThat(viewModel.showSnackBarInt.getOrAwaitValue()).isEqualTo(R.string.err_enter_title)
+        assertThat(viewModel.validateEnteredData(reminder)).isFalse() // check that all data entered, but it return false so it detect that title is missing
+        assertThat(viewModel.showSnackBarInt.getOrAwaitValue()).isEqualTo(R.string.err_enter_title) // check that snakeBar shows "Please enter title"
     }
+    //end of test
 
 
     //  test to check what will be happen if data missing the location name
     @Test
     fun validateEnteredData_EmptyLocationAndUpdateSnackBar() {
         // GIVEN
-        val reminder = ReminderDataItem("Title", "Description", "", 7.32323, 6.54343,"2")
+        val reminder = ReminderDataItem("Title", "Description", "", 7.32323, 6.54343,"2") //add the reminder data to create an object
 
         // THEN
-        assertThat(viewModel.validateEnteredData(reminder)).isFalse()
-        assertThat(viewModel.showSnackBarInt.getOrAwaitValue()).isEqualTo(R.string.err_select_location)
+        assertThat(viewModel.validateEnteredData(reminder)).isFalse() // check that all data entered, but it return false so it detect that location is missing
+        assertThat(viewModel.showSnackBarInt.getOrAwaitValue()).isEqualTo(R.string.err_select_location) // check that snakeBar shows "Please select location"
     }
+    //end of test
 
 
     //  test to check what will be happen if all data submitted
     @Test
     fun saveReminder_showLoading(){
         // GIVEN
-        val reminder = ReminderDataItem("Title", "Description", "Airport", 7.32323, 6.54343,"3")
+        val reminder = ReminderDataItem("Title", "Description", "Airport", 7.32323, 6.54343,"3") //add the reminder data to create an object
 
         // WHEN
-        mainCoroutineRule.pauseDispatcher()
-        viewModel.saveReminder(reminder)
+        mainCoroutineRule.pauseDispatcher() //pausing the dispatcher to make any new coroutines will not execute immediately
+        viewModel.saveReminder(reminder)  // ask to save the reminder in database
 
         // THEN
-        assertThat(viewModel.showLoading.getOrAwaitValue()).isTrue()
-        mainCoroutineRule.resumeDispatcher()
-        assertThat(viewModel.showLoading.getOrAwaitValue()).isFalse()
+        assertThat(viewModel.showLoading.getOrAwaitValue()).isTrue() // while they loading check that loading states is true
+        mainCoroutineRule.resumeDispatcher() //make the dispatcher resume to get other process
+        assertThat(viewModel.showLoading.getOrAwaitValue()).isFalse() // check that loading is finished and loading states is false
     }
+    // end of test
 }

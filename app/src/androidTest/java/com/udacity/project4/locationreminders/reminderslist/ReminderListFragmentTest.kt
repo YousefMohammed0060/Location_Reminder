@@ -61,9 +61,9 @@ class ReminderListFragmentTest: KoinTest {
 
     private val dataSource: ReminderDataSource by inject()
 
-    private val reminder1 = ReminderDTO("Reminder1", "Description1", "Location1", 1.0, 1.0,"1")
-    private val reminder2 = ReminderDTO("Reminder2", "Description2", "location2", 2.0, 2.0, "2")
-    private val reminder3 = ReminderDTO("Reminder3", "Description3", "location3", 3.0, 3.0, "3")
+    private val reminder1 = ReminderDTO("Reminder1", "Description1", "Location1", 1.0, 1.0,"1") //add the reminder1 data to create an object1
+    private val reminder2 = ReminderDTO("Reminder2", "Description2", "location2", 2.0, 2.0, "2") //add the reminder2 data to create an object2
+    private val reminder3 = ReminderDTO("Reminder3", "Description3", "location3", 3.0, 3.0, "3") //add the reminder3 data to create an object3
 
     @Before
     fun initRepository() {
@@ -101,64 +101,64 @@ class ReminderListFragmentTest: KoinTest {
     @Test
     fun reminderList_DisplayedInUi() = runBlockingTest{
         // GIVEN - add reminders
-        dataSource.saveReminder(reminder1)
-        dataSource.saveReminder(reminder2)
-        dataSource.saveReminder(reminder3)
+        dataSource.saveReminder(reminder1) // call the room database to save the reminder1
+        dataSource.saveReminder(reminder2) // call the room database to save the reminder2
+        dataSource.saveReminder(reminder3) // call the room database to save the reminder3
 
         //WHEN - on ReminderListFragment
-        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
+        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme) // here we ake to launch the fragment to apply the test
+        val navController = mock(NavController::class.java) // here we setup the Navigation Controller
         scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
+            Navigation.setViewNavController(it.view!!, navController) // now we ask the app Navigation to fire the fragment and the Navigation Controller
         }
         //THEN - data loaded into the right place
-        onView(withText(reminder1.title)).check(matches(isDisplayed()))
-        onView(withText(reminder2.description)).check(matches(isDisplayed()))
-        onView(withText(reminder3.title)).check(matches(isDisplayed()))
-        onView(withId(R.id.noDataTextView)).check(matches(not(isDisplayed())))
+        onView(withText(reminder1.title)).check(matches(isDisplayed())) // here checking that the title of reminder1 is in his place on the screen
+        onView(withText(reminder2.description)).check(matches(isDisplayed())) // here checking that the description of reminder2 is in his place on the screen
+        onView(withText(reminder3.title)).check(matches(isDisplayed())) // here checking that the title of reminder3 is in his place on the screen
+        onView(withId(R.id.noDataTextView)).check(matches(not(isDisplayed())))  // here checking that the noDataTextView is invisible because the data founded
 
     }
+    // end of test
 
 
     // this test trying to test that UI show us that no data if the room database is empty
     @Test
     fun reminderList_noReminders() = runBlockingTest{
         // GIVEN - delete all data
-        dataSource.deleteAllReminders()
+        dataSource.deleteAllReminders() // ask database to delete all records in the database
 
         //WHEN - on the ReminderListFragment
-        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
+        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme) // here we ake to launch the fragment to apply the test
+        val navController = mock(NavController::class.java) // here we setup the Navigation Controller
         scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
+            Navigation.setViewNavController(it.view!!, navController) // now we ask the app Navigation to fire the fragment and the Navigation Controller
         }
 
         //THEN - shows that no data
-        onView(withText(R.string.no_data)).check(matches(isDisplayed()))
-        onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
-        onView(withText(reminder1.title)).check(doesNotExist())
+        onView(withText(R.string.no_data)).check(matches(isDisplayed())) // here checking that the noDataTextView has the value of no_data
+        onView(withId(R.id.noDataTextView)).check(matches(isDisplayed())) // here checking that the noDataTextView is in his place on the screen
+        onView(withText(reminder1.title)).check(doesNotExist()) // here check the the value of reminder1 title is not exist, because their is no data founded
 
     }
+    // end of test
 
 
     // this test trying to test that when we click the fab_btn it navigate to destination fragment
     @Test
     fun clickFab_navigateToReminderFragment() = runBlockingTest {
         // GIVEN - On the home screen
-        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
+        val scenario = launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme) // here we ake to launch the fragment to apply the test
+        val navController = mock(NavController::class.java) // here we setup the Navigation Controller
         scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
+            Navigation.setViewNavController(it.view!!, navController) // now we ask the app Navigation to fire the fragment and the Navigation Controller
         }
 
         // WHEN - Click on the "+" button
-        onView(withId(R.id.addReminderFAB)).perform(click())
+        onView(withId(R.id.addReminderFAB)).perform(click()) // ask the ui to click the float action button
 
         // THEN - Verify that we navigate to the save reminder fragment
-        verify(navController).navigate(
-            ReminderListFragmentDirections.toSaveReminder()
-            )
+        verify(navController).navigate(ReminderListFragmentDirections.toSaveReminder()) // check that the click navigate to the right place
     }
-
+    // end of test
 
 }

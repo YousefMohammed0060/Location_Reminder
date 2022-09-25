@@ -53,46 +53,49 @@ class RemindersListViewModelTest {
     // test to check what will be happen while the app waiting for data
     @Test
     fun loadReminders_showLoading() {
-        mainCoroutineRule.pauseDispatcher()
+        mainCoroutineRule.pauseDispatcher() //pausing the dispatcher to make any new coroutines will not execute immediately
 
         // WHEN
-        viewModel.loadReminders()
-        assertThat(viewModel.showLoading.getOrAwaitValue()).isTrue()
-        mainCoroutineRule.resumeDispatcher()
+        viewModel.loadReminders() // ask to load the reminders to show them into the recyclerView
+        assertThat(viewModel.showLoading.getOrAwaitValue()).isTrue() // while they loading check that loading states is true
+        mainCoroutineRule.resumeDispatcher() //make the dispatcher resume to get other process
 
         // THEN
-        assertThat(viewModel.showLoading.getOrAwaitValue()).isFalse()
-
+        assertThat(viewModel.showLoading.getOrAwaitValue()).isFalse() // check that loading is finished and loading states is false
     }
+    // end of test
+
 
     //  test to check what will be happen if list have a data of reminder
     @Test
     fun loadReminders_remainderListNotEmpty() = mainCoroutineRule.runBlockingTest {
         // GIVEN
-        val reminder = ReminderDTO("My Store", "Pick Stuff", "Abuja", 6.454202, 7.599545)
+        val reminder = ReminderDTO("My Store", "Pick Stuff", "Abuja", 6.454202, 7.599545) //add the reminder data to create an object
 
         // WHEN
-        remindersRepository.saveReminder(reminder)
-        viewModel.loadReminders()
+        remindersRepository.saveReminder(reminder) // using the repository and dispatchers to ask database to save the reminder
+        viewModel.loadReminders() // ask to load the reminders to show them into the recyclerView
 
         // THEN
-        assertThat(viewModel.remindersList.getOrAwaitValue()).isNotEmpty()
+        assertThat(viewModel.remindersList.getOrAwaitValue()).isNotEmpty() // check that list in the viewModel is not empty
     }
+    // end of test
 
 
     // test to check what will be happen if list is empty
     @Test
     fun loadReminders_updateSnackBarValue() {
-        mainCoroutineRule.pauseDispatcher()
+        mainCoroutineRule.pauseDispatcher() //pausing the dispatcher to make any new coroutines will not execute immediately
 
         // WHEN
-        remindersRepository.setReturnError(true)
-        viewModel.loadReminders()
-        mainCoroutineRule.resumeDispatcher()
+        remindersRepository.setReturnError(true) // the return error to check what the system will show
+        viewModel.loadReminders() // ask to load the reminders to show them into the recyclerView
+        mainCoroutineRule.resumeDispatcher() //make the dispatcher resume to get other process
 
         // THEN
-        assertThat(viewModel.showSnackBar.getOrAwaitValue()).isEqualTo("Error getting reminders")
+        assertThat(viewModel.showSnackBar.getOrAwaitValue()).isEqualTo("Error getting reminders") // check that the system return to user that "Error getting reminders" to let him know that their is problem  to get data
     }
+    // end of test
 }
 
 
